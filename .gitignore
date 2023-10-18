@@ -6,6 +6,9 @@ __`git commit.command
 __`Initiate venv.command
 __`Start.command
 
+static/Gadget-perkcalc-data.js
+static/Gadget-perkcalc-core.js
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
