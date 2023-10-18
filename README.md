@@ -1,0 +1,1 @@
+A calculator for the RuneScape 3 MMORPG to list all of the possible invention perk combinations and their probabilities, in an attempt to pinpoint the best possible option.
