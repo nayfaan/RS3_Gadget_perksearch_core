@@ -2,6 +2,7 @@ from tqdm import tqdm
 import itertools
 import numpy as np
 import math
+import os
 
 import multiprocessing
 import threading
@@ -44,7 +45,7 @@ def write2file(arr, filename):
 
     print("Completed: " + filename)
 
-def comps_permutator(gizmo, type, queue=None):
+def comps_permutator(gizmo, type):
     iterable = comps["normal"][gizmo]
     slots = None
     if type == "normal":
@@ -56,29 +57,27 @@ def comps_permutator(gizmo, type, queue=None):
         slots = 5
         # iterable = np.concatenate([iterable, comps["ancient"][gizmo]])
 
-    pos = 0
-    if queue:
-        current = multiprocessing.current_process()
-        pos = current._identity[0]-1
+    current = multiprocessing.current_process()
+    pos = current._identity[0]-1
 
     print()
     result = []
-    with tqdm(
-        total=combLen(len(iterable), slots),
-        desc="Iterating: " + type + " " + gizmo,
-        mininterval=1,
-        bar_format="{l_bar}{bar:20}{r_bar}{bar:-20b}",
-        dynamic_ncols=True,
-        position=pos
-    ) as pbar:
-        for p in itertools.combinations_with_replacement(tqdm(iterable), slots):
-            result.append(p)
-            pbar.update()
 
-    if queue:
-        queue.put(result)
-    else:
-        return result
+    filename = gizmo + "_" + type
+    with open("./output/" + filename + ".js", "w") as f:
+        f.write("var " + filename + " = [")
+
+        with tqdm(
+            total=combLen(len(iterable), slots),
+            desc="Iterating: " + type + " " + gizmo,
+            mininterval=1,
+            bar_format="{l_bar}{bar:20}{r_bar}{bar:-20b}",
+            dynamic_ncols=True,
+            position=pos
+        ) as pbar:
+            for p in itertools.combinations_with_replacement(tqdm(iterable), slots):
+                f.write(str(p) + ", ")
+                pbar.update()
 
 def run():
     # pool = multiprocessing.Pool(os.cpu_count() - 1)
@@ -119,13 +118,9 @@ def run():
     # write2file(perm["armour"]["normal"], "armour_normal")
 
     # Ancient gizmos
-    queue1 = multiprocessing.Queue()
-    queue2 = multiprocessing.Queue()
-    queue3 = multiprocessing.Queue()
-
-    p1 = multiprocessing.Process(target=comps_permutator, args=("tool", "ancient", queue1))
-    p2 = multiprocessing.Process(target=comps_permutator, args=("weapon", "ancient", queue2))
-    p3 = multiprocessing.Process(target=comps_permutator, args=("armour", "ancient", queue3))
+    p1 = multiprocessing.Process(target=comps_permutator, args=("tool", "ancient"))
+    p2 = multiprocessing.Process(target=comps_permutator, args=("weapon", "ancient"))
+    p3 = multiprocessing.Process(target=comps_permutator, args=("armour", "ancient"))
 
     p1.start()
     p2.start()
@@ -138,20 +133,6 @@ def run():
     p1.join()
     p2.join()
     p3.join()
-
-    t1 = threading.Thread(target=write2file, args=(perm["tool"]["ancient"], "tool_ancient"))
-    t2 = threading.Thread(target=write2file, args=(perm["weapon"]["ancient"], "weapon_ancient"))
-    t3 = threading.Thread(target=write2file, args=(perm["armour"]["ancient"], "armour_ancient"))
-
-    t1.start()
-    t2.start()
-    t3.start()
-
-    t1.join()
-    t2.join()
-    t3.join()
-
-    # write2file(perm, "perm")
 
 if __name__ == "__main__":
     run()
