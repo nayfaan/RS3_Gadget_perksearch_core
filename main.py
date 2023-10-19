@@ -24,11 +24,17 @@ def write2file(arr, filename):
 
     with open("./output/" + filename + ".js", "w") as f:
         f.write("var " + filename + " = [")
-        
-        with tqdm(total=n, desc="Print: " + filename, mininterval=1) as pbar:
+
+        with tqdm(
+            total=n,
+            desc="Printing: " + filename,
+            mininterval=1,
+            bar_format="{l_bar}{bar:20}{r_bar}{bar:-20b}",
+            dynamic_ncols=True,
+        ) as pbar:
             for i in range(0, n, k):
                 chunk = _arr[i : i + k]
-                chunk.tofile(f, sep=', ')
+                chunk.tofile(f, sep=", ")
                 pbar.update(len(chunk))
 
         f.write("]")
@@ -52,8 +58,10 @@ def comps_permutator(gizmo, type):
     result = []
     with tqdm(
         total=combLen(len(iterable), slots),
-        desc="Ite: " + type + " " + gizmo,
+        desc="Iterating: " + type + " " + gizmo,
         mininterval=1,
+        bar_format="{l_bar}{bar:20}{r_bar}{bar:-20b}",
+        dynamic_ncols=True,
     ) as pbar:
         for p in itertools.combinations_with_replacement(tqdm(iterable), slots):
             result.append(p)
@@ -67,21 +75,23 @@ def run():
 
     # test = comps_permutator("tool", "test")
     # write2file(test, "test")
+    
+    # # Normal gizmos (compiled)
+    # perm["tool"]["normal"] = comps_permutator("tool", "normal")
+    # write2file(perm["tool"]["normal"], "tool_normal")
 
-    perm["tool"]["normal"] = comps_permutator("tool", "normal")
-    write2file(perm["tool"]["normal"], "tool_normal")
+    # perm["weapon"]["normal"] = comps_permutator("weapon", "normal")
+    # write2file(perm["weapon"]["normal"], "weapon_normal")
 
+    # perm["armour"]["normal"] = comps_permutator("armour", "normal")
+    # write2file(perm["armour"]["normal"], "armour_normal")
+
+    # Ancient gizmos
     perm["tool"]["ancient"] = comps_permutator("tool", "ancient")
     write2file(perm["tool"]["ancient"], "tool_ancient")
 
-    perm["weapon"]["normal"] = comps_permutator("weapon", "normal")
-    write2file(perm["weapon"]["normal"], "weapon_normal")
-
     perm["weapon"]["ancient"] = comps_permutator("weapon", "ancient")
     write2file(perm["weapon"]["ancient"], "weapon_ancient")
-
-    perm["armour"]["normal"] = comps_permutator("armour", "normal")
-    write2file(perm["armour"]["normal"], "armour_normal")
 
     perm["armour"]["ancient"] = comps_permutator("armour", "ancient")
     write2file(perm["armour"]["ancient"], "armour_ancient")
