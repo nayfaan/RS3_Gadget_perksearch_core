@@ -3,6 +3,9 @@ import itertools
 import numpy as np
 import math
 
+import os
+from multiprocessing import Pool
+
 from services.comps import comps
 from services.comp_list import comp_list
 
@@ -50,9 +53,9 @@ def comps_permutator(gizmo, type):
     elif type == "ancient":
         slots = 9
         iterable = np.concatenate([iterable, comps["ancient"][gizmo]])
-    # elif type == "test":
-    #     slots = 5
-    #     iterable = np.concatenate([iterable, comps["ancient"][gizmo]])
+    elif type == "test":
+        slots = 5
+        iterable = np.concatenate([iterable, comps["ancient"][gizmo]])
 
     print()
     result = []
@@ -69,10 +72,13 @@ def comps_permutator(gizmo, type):
 
     return result
 
-
 def run():
+    pool = Pool(os.cpu_count() - 1)
+    
     perm = {"tool": {}, "weapon": {}, "armour": {}}
 
+    # test = pool.starmap(comps_permutator, [("tool", "test")])
+    # pool.starmap(write2file, [(test, "test")])
     # test = comps_permutator("tool", "test")
     # write2file(test, "test")
     
@@ -87,16 +93,19 @@ def run():
     # write2file(perm["armour"]["normal"], "armour_normal")
 
     # Ancient gizmos
-    perm["tool"]["ancient"] = comps_permutator("tool", "ancient")
-    write2file(perm["tool"]["ancient"], "tool_ancient")
+    perm["tool"]["ancient"] = pool.starmap(comps_permutator, [("tool", "ancient")])
+    pool.starmap(write2file, [(perm["tool"]["ancient"], "tool_ancient")])
 
-    perm["weapon"]["ancient"] = comps_permutator("weapon", "ancient")
-    write2file(perm["weapon"]["ancient"], "weapon_ancient")
+    perm["weapon"]["ancient"] = pool.starmap(comps_permutator, [("weapon", "ancient")])
+    pool.starmap(write2file, [(perm["weapon"]["ancient"], "weapon_ancient")])
 
-    perm["armour"]["ancient"] = comps_permutator("armour", "ancient")
-    write2file(perm["armour"]["ancient"], "armour_ancient")
+    perm["armour"]["ancient"] = pool.starmap(comps_permutator, [("armour", "ancient")])
+    pool.starmap(write2file, [(perm["armour"]["ancient"], "armour_ancient")])
 
-    write2file(perm, "perm")
+    pool.starmap(write2file, [(perm, "perm")])
+
+    pool.close()
+    pool.join()
 
 
 if __name__ == "__main__":
