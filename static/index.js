@@ -32,16 +32,24 @@ var comps = {
     }
 };
 
+var perks = [];
+
 function distribute_comps(comp, comp_data, type){
     if (comp_data.tool.length > 0) comps[type].tool.push(comp);
     if (comp_data.weapon.length > 0) comps[type].weapon.push(comp);
     if (comp_data.armour.length > 0) comps[type].armour.push(comp);
 }
 
+
 for (var comp in data.comps) {
     var comp_data = data.comps[comp];
     if ('ancient' in comp_data) distribute_comps(comp, comp_data,"ancient")
     else distribute_comps(comp, comp_data, "normal")
+}
+
+for (var perk in data.perks) {
+    var perk_data = data.comps[perks];
+    perks.push(perk)
 }
 
 // start_worker();

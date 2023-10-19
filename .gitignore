@@ -5,6 +5,7 @@ __commit.py
 __`git commit.command
 __`Initiate venv.command
 __`Start.command
+test.py
 
 static/Gadget-perkcalc-data.js
 static/Gadget-perkcalc-core.js
